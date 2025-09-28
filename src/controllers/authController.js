@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js'; // Import the default export 'User'
+import { signJwt } from '../config/jwt.js';
 
 // Registro de usuario
 export const registrarUsuario = async (req, res) => {
@@ -94,14 +94,13 @@ export const loginUsuario = async (req, res) => {
     }
 
     // Generar el token JWT
-    const token = jwt.sign(
+    const token = signJwt(
       { 
         id: user.id, 
         correo: user.correo,
         nombre: user.nombre,
         rol_id: user.rol_id
       }, 
-      process.env.JWT_SECRET || 'tu_clave_secreta_por_defecto', 
       { expiresIn: '1h' }
     );
 
@@ -178,13 +177,12 @@ export const RecoverPassword = async (req, res) => {
     }
 
     // Si no se proporciona nueva contraseña, generar token para recuperación
-    const token = jwt.sign(
+    const token = signJwt(
       { 
         id: user.id, 
         correo: user.correo,
         tipo: 'recuperacion'
       }, 
-      process.env.JWT_SECRET || 'tu_clave_secreta_por_defecto', 
       { expiresIn: '1h' }
     );
 

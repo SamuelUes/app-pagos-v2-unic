@@ -1,7 +1,6 @@
 import express from 'express';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -14,6 +13,7 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import historialRoutes from './routes/historial.js';
 import dotenv from 'dotenv';
+import { verifyJwt } from './config/jwt.js';
 
 
 // Configurar variables de entorno
@@ -45,7 +45,7 @@ app.use(async (req, res, next) => {
   try {
     const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
     if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
+      const decoded = verifyJwt(token);
       const usuario = await User.findByPk(decoded.id);
       if (usuario) {
         res.locals.usuario = usuario;
