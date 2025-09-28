@@ -40,7 +40,7 @@ export const registrarUsuario = async (req, res) => {
       telefono,
       cedula,
       fecha_registro: new Date(),
-      rol_id: 2 // Siempre será Usuario
+      rol_id: 1 // Siempre será Usuario -- 1 = Admin
     });
 
     // Notificar a los clientes conectados sobre el nuevo usuario
