@@ -13,7 +13,7 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import historialRoutes from './routes/historial.js';
 import dotenv from 'dotenv';
-import { verifyJwt } from './config/jwt.js';
+import { verifyJwt } from './middleware/authMiddleware.js';
 
 
 // Configurar variables de entorno

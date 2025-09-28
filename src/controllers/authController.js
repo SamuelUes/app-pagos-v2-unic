@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/userModel.js'; // Import the default export 'User'
-import { signJwt } from '../config/jwt.js';
+import { signJwt } from '../middleware/authMiddleware.js';
 
 // Registro de usuario
 export const registrarUsuario = async (req, res) => {

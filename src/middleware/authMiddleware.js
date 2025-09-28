@@ -2,13 +2,25 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 
+// JWT helpers centralizados aquí
+export function getJwtSecret() {
+    return process.env.JWT_SECRET || 'fallback_secret_key';
+}
+
+export function verifyJwt(token, options = {}) {
+    return jwt.verify(token, getJwtSecret(), options);
+}
+
+export function signJwt(payload, options = {}) {
+    return jwt.sign(payload, getJwtSecret(), options);
+}
+
 export const verificarToken = async (req, res, next) => {
     console.log('Verificando token para ruta:', req.path);
     console.log('Cookies recibidas:', req.cookies);
     
     try {
         const token = req.cookies.token;
-
         if (!token) {
             console.log('No se encontró token en las cookies');
             if (req.path.startsWith('/api/')) {
@@ -21,7 +33,7 @@ export const verificarToken = async (req, res, next) => {
         }
 
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded = verifyJwt(token);
             console.log('Token decodificado:', decoded);
             
             const usuario = await User.findByPk(decoded.id);
@@ -121,4 +133,4 @@ export const esAdmin = async (req, res, next) => {
             mensaje: 'Error al verificar permisos'
         });
     }
-};
+}
