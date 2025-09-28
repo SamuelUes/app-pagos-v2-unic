@@ -25,4 +25,5 @@ const sequelize = process.env.DATABASE_URL
       }
     );
 
-module.exports = sequelize;
+    module.exports = { sequelize };
+
