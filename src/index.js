@@ -9,7 +9,7 @@ import authRoutes from './routes/authRoutes.js';
 import indexRoutes from './routes/indexRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
-import { User } from './models/indexModel.js';
+import { User, sequelize } from './models/indexModel.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import historialRoutes from './routes/historial.js';
@@ -36,6 +36,9 @@ app.use(express.static(join(__dirname, 'publicassets')));
 // Configurar motor de vistas
 app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// Exponer io para controladores que lo necesiten
+app.set('io', io);
 
 // Middleware de autenticación JWT
 app.use(async (req, res, next) => {
@@ -87,11 +90,28 @@ app.use((req, res) => {
   });
 });
 
-// Arranque del servidor (PORT dinámico para Heroku)
+// Arranque del servidor: autenticar y sincronizar DB antes de escuchar
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
+
+(async () => {
+  try {
+    console.log('Conectando a la base de datos...');
+    await sequelize.authenticate();
+    console.log('Conexión a la base de datos establecida.');
+
+    // Sincronizar modelos (usar alter en desarrollo; en producción preferir migraciones)
+    const alter = process.env.DB_ALTER_SYNC === 'true';
+    await sequelize.sync({ alter });
+    console.log('Modelos sincronizados.');
+
+    httpServer.listen(PORT, () => {
+      console.log(`Servidor corriendo en el puerto ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Error al iniciar la aplicación:', err);
+    process.exit(1);
+  }
+})();
 
 export { app, io };
 
